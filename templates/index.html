@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<form action="" method="GET">
+    <div id="state-area">
+        <label for="state">State:</label>
+        <select id="state">
+            {% for state in states %}
+                <option value="{{ state.state }}">{{ state.NAME }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div id="county-area">
+
+    </div>
+</form>
+
+<script id="product" type="text/template">
+    <p><span>items</span><span class='items'><%= _.each(info.items, function(books) { %>
+      <%= books.name + ",&nbsp" %>
+      <% }); %></span></p>
+</script>
+
+<script type="text/template" id="template-county">
+    <label for="county">County:</label>
+    <select id="county">
+        <% _.each(counties, function(elem) { %>
+            <option value="<%= elem.county %>"><%= elem.NAME %></option>
+        <% }); %>
+    </select>
+</script>
+<script type="text/javascript" src="/static/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/static/json2.js"></script>
+<script type="text/javascript" src="/static/underscore.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $("#state").change(function(){
+            $.getJSON("/counties/" + $("option:selected", $(this)).attr("value"), function(data){
+                var county_select = _.template($("#template-county").html(), {counties: data});
+                $("#county-area").html(county_select);
+
+            });
+        });
+    });
+</script>
+</body>
+</html>
