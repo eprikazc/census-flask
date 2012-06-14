@@ -14,16 +14,12 @@
             {% endfor %}
         </select>
     </div>
-    <div id="county-area">
+    <div id="county-area"></div>
+    <div id="statistic-area"></div>
+    <div id="table-area"></div>
 
     </div>
 </form>
-
-<script id="product" type="text/template">
-    <p><span>items</span><span class='items'><%= _.each(info.items, function(books) { %>
-      <%= books.name + ",&nbsp" %>
-      <% }); %></span></p>
-</script>
 
 <script type="text/template" id="template-county">
     <label for="county">County:</label>
@@ -33,18 +29,64 @@
         <% }); %>
     </select>
 </script>
+<script type="text/template" id="template-statistic">
+    <label for="statistic">Statistic:</label>
+    <select id="statistic">
+        <% _.each(statistics, function(elem) { %>
+        <option value="<%= elem %>"><%= elem %></option>
+        <% }); %>
+    </select>
+</script>
+<script type="text/template" id="template-table">
+    <table>
+        <tbody>
+            <% _.each(table_data, function(elem) { %>
+            <tr>
+                <td><%= elem[1] %></td>
+                <td><%= elem[2] %></td>
+            </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</script>
+
+
+
 <script type="text/javascript" src="/static/jquery-1.7.2.min.js"></script>
-<script type="text/javascript" src="/static/json2.js"></script>
 <script type="text/javascript" src="/static/underscore.js"></script>
 <script type="text/javascript">
     $(function(){
-        $("#state").change(function(){
-            $.getJSON("/counties/" + $("option:selected", $(this)).attr("value"), function(data){
+        $("#state").live("change", function(){
+            $.getJSON("/counties/" + $("option:selected", $("#state")).attr("value"), function(data){
                 var county_select = _.template($("#template-county").html(), {counties: data});
                 $("#county-area").html(county_select);
 
             });
+            $("#county-area").html("");
+            $("#statistic-area").html("");
+            $("#table-area").html("");
         });
+        $("#county").live("change", function(){
+            $.getJSON("/stat", function(data){
+                var stat_select = _.template($("#template-statistic").html(), {statistics: data});
+                $("#statistic-area").html(stat_select);
+
+            });
+            $("#statistic-area").html("");
+            $("#table-area").html("");
+        });
+        $("#statistic").live("change", function(){
+            $.getJSON("/stat/" +
+                    $("option:selected", $("#state")).attr("value") + "/" +
+                    $("option:selected", $("#county")).attr("value") + "/" +
+                    $("option:selected", $("#statistic")).attr("value"),
+                    function(data){
+                        var table_data = _.template($("#template-table").html(), {table_data: data});
+                        $("#table-area").html(table_data);
+                    });
+        });
+
+
     });
 </script>
 </body>
